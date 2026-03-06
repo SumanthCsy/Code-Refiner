@@ -1,7 +1,7 @@
 # 🛠️ Code Refiner: Neural Coding Forge
 ### *Gen-AI Forge Hackathon 2026 Entry*
 
-[![Team: Neural Coders](https://img.shields.io/badge/Team-Neural%20Coders-blueviolet?style=for-the-badge)](https://github.com/SumanthCsy/Code-Refiners)
+[![Team: Neural Coders](https://img.shields.io/badge/Team-Neural%20Coders-blueviolet?style=for-the-badge)](https://github.com/SumanthCsy/Code-Refiner)
 [![Status: Production](https://img.shields.io/badge/Status-Production--Ready-emerald?style=for-the-badge)](https://github.com/SumanthCsy/Code-Refiner)
 
 Code Refiner is a high-performance, AI-driven development suite designed to elevate code quality through autonomous neural analysis. Built for the **Gen-AI Forge Hackathon 2026**, it provides developers with a professional-grade workspace to detect vulnerabilities, refactor architecture, and generate production-ready logic with surgical precision.
