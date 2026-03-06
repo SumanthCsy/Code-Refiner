@@ -77,6 +77,7 @@ Follow these steps to get Code Refiner running on your local machine:
     ```env
     VITE_FIREBASE_API_KEY=your_key
     VITE_GEMINI_API_KEY=your_key
+    VITE_HUGGINGFACE_API_KEY=your_key
     ```
 
 3.  **Start Development Server:**

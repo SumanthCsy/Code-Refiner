@@ -1,9 +1,9 @@
 const sounds = {
-    error: '/src/assets/error.mp3',
-    clean: '/src/assets/clean.mp3',
-    popup: '/src/assets/popups.mp3',
-    splash: '/src/assets/splash_audio.mp3',
-    app: '/src/assets/app_audio.mp3',
+    error: '/sounds/error.mp3',
+    clean: '/sounds/clean.mp3',
+    popup: '/sounds/popups.mp3',
+    splash: '/sounds/splash_audio.mp3',
+    app: '/sounds/app_audio.mp3',
 };
 
 // Pre-instantiate splash to reduce delay

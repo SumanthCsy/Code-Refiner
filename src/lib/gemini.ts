@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// Project's built-in Gemini API key - fallback only
+// Project's built-in API keys - fallback only
 const DEFAULT_GEMINI_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
+const DEFAULT_HF_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY || "";
 const GEMINI_MODEL = "gemini-2.0-flash";
 
 // Default models when user doesn't specify
@@ -10,9 +11,7 @@ const OR_DEFAULT_MODEL = "openai/gpt-3.5-turbo";
 
 /**
  * Resolve which API config to use.
- * Priority: user's saved active key → built-in Gemini fallback
- * The `code_refiner_use_custom` flag is the source of truth for
- * whether the user has explicitly activated a custom key.
+ * Priority: user's saved active key → environment fallback (if provider matches) → built-in Gemini fallback
  */
 const resolveKey = (): {
     key: string;
@@ -36,7 +35,16 @@ const resolveKey = (): {
         };
     }
 
-    // Fall back to project's built-in Gemini key
+    // Check for environment fallbacks based on the currently selected (but not key-filled) provider
+    if (storedProvider === 'huggingface' && DEFAULT_HF_KEY) {
+        return {
+            key: DEFAULT_HF_KEY,
+            provider: 'huggingface',
+            customModel: customModel || undefined
+        };
+    }
+
+    // Default to built-in Gemini key
     return { key: DEFAULT_GEMINI_KEY, provider: "gemini" };
 };
 
