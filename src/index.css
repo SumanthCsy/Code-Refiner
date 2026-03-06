@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cyber-blue: #0ff;
+  --color-cyber-purple: #b026ff;
+  --color-cyber-dark: #0a0a0f;
+  --color-cyber-card: #12121c;
+  --color-cyber-border: #1f1f2e;
+
+  --font-inter: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--color-cyber-dark);
+  color: #fff;
+  font-family: var(--font-inter);
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cyber-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-cyber-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-cyber-purple);
+}
+
+.glass-panel {
+  background: rgba(18, 18, 28, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cyber-glow {
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), inset 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.cyber-glow-purple {
+  box-shadow: 0 0 15px rgba(176, 38, 255, 0.2), inset 0 0 10px rgba(176, 38, 255, 0.1);
+}
+
+.animated-gradient-text {
+  background: linear-gradient(to right, #0ff, #b026ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: hue-rotate 5s linear infinite;
+}
+
+@keyframes hue-rotate {
+  from {
+    filter: hue-rotate(0deg);
+  }
+
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+.mac-btn-red {
+  background-color: #ff5f56;
+}
+
+.mac-btn-yellow {
+  background-color: #ffbd2e;
+}
+
+.mac-btn-green {
+  background-color: #27c93f;
+}
