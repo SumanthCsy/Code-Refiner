@@ -48,40 +48,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     useEffect(() => {
+        // Safety timeout: ensure app loads even if Firebase hangs
+        const safetyTimer = setTimeout(() => {
+            if (loading) {
+                console.warn("Auth listener timed out. Proceeding and disabling auth features.");
+                setLoading(false);
+            }
+        }, 5000);
+
+        if (!auth || !db) {
+            setLoading(false);
+            clearTimeout(safetyTimer);
+            return;
+        }
+
+        const firebaseAuth = auth;
+        const firestore = db;
+
         let unsubscribeFirestore: (() => void) | null = null;
 
-        const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
+        const unsubscribeAuth = onAuthStateChanged(firebaseAuth, async (currentUser) => {
             setUser(currentUser);
 
-            if (currentUser) {
-                // Initial fetch from Firestore
-                const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                if (userDoc.exists() && userDoc.data().keys) {
-                    const cloudKeys = userDoc.data().keys;
-                    setApiKeys(cloudKeys);
-                    updateLocalCache(cloudKeys);
-                }
-
-                // Setup listener for real-time updates
-                unsubscribeFirestore = onSnapshot(doc(db, 'users', currentUser.uid), (doc) => {
-                    if (doc.exists() && doc.data().keys) {
-                        const cloudKeys = doc.data().keys;
+            try {
+                if (currentUser) {
+                    // Initial fetch from Firestore
+                    const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
+                    if (userDoc.exists() && userDoc.data().keys) {
+                        const cloudKeys = userDoc.data().keys;
                         setApiKeys(cloudKeys);
                         updateLocalCache(cloudKeys);
                     }
-                });
-            } else {
-                if (unsubscribeFirestore) {
-                    unsubscribeFirestore();
-                    unsubscribeFirestore = null;
+
+                    // Setup listener for real-time updates
+                    unsubscribeFirestore = onSnapshot(doc(firestore, 'users', currentUser.uid), (doc) => {
+                        if (doc.exists() && doc.data().keys) {
+                            const cloudKeys = doc.data().keys;
+                            setApiKeys(cloudKeys);
+                            updateLocalCache(cloudKeys);
+                        }
+                    });
+                } else {
+                    if (unsubscribeFirestore) {
+                        unsubscribeFirestore();
+                        unsubscribeFirestore = null;
+                    }
                 }
+            } catch (error) {
+                console.error("Firestore sync error:", error);
+            } finally {
+                setLoading(false);
+                clearTimeout(safetyTimer);
             }
-            setLoading(false);
         });
 
         return () => {
             unsubscribeAuth();
             if (unsubscribeFirestore) unsubscribeFirestore();
+            clearTimeout(safetyTimer);
         };
     }, []);
 
@@ -108,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setApiKeys(newKeys);
         updateLocalCache(newKeys);
 
-        if (user) {
+        if (user && db) {
             try {
                 await setDoc(doc(db, 'users', user.uid), { keys: newKeys }, { merge: true });
             } catch (error) {
@@ -119,6 +143,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const loginWithGoogle = async () => {
+        if (!auth) throw new Error("Authentication is not configured.");
         try {
             await signInWithPopup(auth, googleProvider);
         } catch (error) {
@@ -128,6 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const loginWithEmail = async (email: string, pass: string) => {
+        if (!auth) throw new Error("Authentication is not configured.");
         try {
             await signInWithEmailAndPassword(auth, email, pass);
         } catch (error) {
@@ -137,6 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const signupWithEmail = async (email: string, pass: string, name: string) => {
+        if (!auth) throw new Error("Authentication is not configured.");
         try {
             const res = await createUserWithEmailAndPassword(auth, email, pass);
             if (res.user) {
@@ -149,6 +176,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const resetPassword = async (email: string) => {
+        if (!auth) throw new Error("Authentication is not configured.");
         try {
             await sendPasswordResetEmail(auth, email);
         } catch (error) {
@@ -158,7 +186,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const updateUserName = async (name: string) => {
-        if (!user) return;
+        if (!user || !auth) return;
         try {
             await updateProfile(user, { displayName: name });
             // Refresh local user state
@@ -170,6 +198,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const logout = async () => {
+        if (!auth) return;
         try {
             await signOut(auth);
         } catch (error) {
